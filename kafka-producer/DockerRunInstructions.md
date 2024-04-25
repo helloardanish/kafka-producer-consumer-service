@@ -7,3 +7,7 @@ Run it:
 docker run -p 8080:8080 kafka-producer:v1
 
 docker run -p 8090:8090 kafka-producer:v1 #if port changed
+
+Access command line:
+
+docker exec -it kafka-producer:v1 /bin/bash
