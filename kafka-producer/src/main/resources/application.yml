@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: kafka-producer
+
+server:
+  port: 8090
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/app.log
+    max-size: 10MB
+    max-history: 30
