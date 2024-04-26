@@ -1,0 +1,15 @@
+Build :
+
+Docker build -t kafka-service:v1 .
+
+Run:
+
+docker run kafka-service:v1
+
+docker run -it kafka-service:v1
+
+docker run -it --rm kafka-service:v1
+
+Outside container
+
+docker run -it --rm -p 9092:9092 kafka-service:v1
