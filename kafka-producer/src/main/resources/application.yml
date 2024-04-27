@@ -1,14 +1,32 @@
 spring:
   application:
     name: kafka-producer
+  kafka:
+    producer:
+      retries: 1
+      bootstrap-servers: localhost:9092
+      #bootstrap-servers: 172.17.0.2:9092 # Find of container: docker inspect <container_id_or_name> | grep IPAddress
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        connection.timeout.ms: 1000
+
+
 
 server:
-  port: 8090
+  port: 8081
+
+message:
+  shceduler:
+    cron: 10000 #2*60*1000
+  kafka:
+    producer:
+      topic: message
 
 logging:
   level:
     root: INFO
-  file:
-    name: logs/app.log
-    max-size: 10MB
-    max-history: 30
+#  file:
+#   name: logs/app.log
+#  max-size: 10MB
+# max-history: 30
