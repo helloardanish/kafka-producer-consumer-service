@@ -27,7 +27,7 @@ public class MessageSchedulerService {
     //@Scheduled(fixedRateString = "${message.shceduler.cron}")
     public void scheduleTask() {
         logger.info("Pushing into kafka");
-        kafkaProducerService.sendMessage("Hi, there!");
+        kafkaProducerService.sendMessage("Hey, A R!");
     }
 }
 /*
