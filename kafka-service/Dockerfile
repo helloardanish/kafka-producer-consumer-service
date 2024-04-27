@@ -29,18 +29,12 @@ RUN chmod +x initial_commands.sh
 # Run the script to start servers, create topic, and stop servers after 30 seconds
 RUN ./initial_commands.sh
 
+# Create a script file for entrypoint
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-# Define the entrypoint to start ZooKeeper and Kafka servers
+# Expose Kafka ports
+EXPOSE 9092 2181
 
-#ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties & \
-#    sleep 5; \
-#    kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties &"]
-
-
-#ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh #kafka-3.7.0-src/config/zookeeper.properties & \
-#    kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties & \
-#   wait"]
-
-ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties & \
-    kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties & \
-    tail -f /dev/null"]
+#ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 86400; done"]

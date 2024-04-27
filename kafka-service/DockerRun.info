@@ -4,12 +4,58 @@ Docker build -t kafka-service:v1 .
 
 Run:
 
-docker run kafka-service:v1
+docker run -d kafka-service:v1
 
-docker run -it kafka-service:v1
+docker run -d 9092:9092 -p 2181:2181 kafka-service:v1
 
-docker run -it --rm kafka-service:v1
+docker run -d --network=host kafka-service:v1
 
-Outside container
+docker run -d -p 9092:9092 -p 2181:2181 kafka-service:v1
 
-docker run -it --rm -p 9092:9092 kafka-service:v1
+Take machine terminal:
+
+# find name of container
+
+docker ps
+
+# determined_mayer is name of container
+docker exec -it priceless_chaplygin /bin/bash
+docker exec -it nervous_williamson /bin/bash
+
+# Run zookeeper and kafka
+
+nohup kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties &
+
+# Press enter if not returned to terminal
+
+nohup kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties &
+
+# Press enter if not returned to terminal
+
+# Check the output
+cat nohup.out
+
+
+# Find ip of container
+
+docker inspect pedantic_mcnulty | grep IPAddress
+
+# Run Kafka commands as required
+
+#Show all topics
+kafka-3.7.0-src/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+/opt/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+#Push message in the topic
+kafka-3.7.0-src/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic message
+
+#listen to topics
+kafka-3.7.0-src/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic message --from-beginning
+
+
+#delete a topic
+kafka-3.7.0-src/bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic message
+
+#create a topic
+kafka-3.7.0-src/bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic notifications

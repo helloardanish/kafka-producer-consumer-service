@@ -1,0 +1,93 @@
+FROM ubuntu:latest
+
+WORKDIR /app
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y wget && apt-get install -y curl && apt-get install -y openjdk-21-jdk
+
+# Download Kafka source
+RUN wget https://downloads.apache.org/kafka/3.7.0/kafka-3.7.0-src.tgz \
+    && tar -xzf kafka-3.7.0-src.tgz \
+    && rm kafka-3.7.0-src.tgz
+
+
+RUN update-alternatives --config javac
+
+# Set JAVA_HOME environment variable
+ENV JAVA_HOME /usr/lib/jvm/java-21-openjdk-arm64/
+
+# Build Kafka using gradlew
+RUN cd kafka-3.7.0-src \
+    && ./gradlew jar -PscalaVersion=2.13.12
+
+# Remove SLF4J Duplication
+RUN rm /app/kafka-3.7.0-src/trogdor/build/dependant-libs-2.13.12/slf4j-reload4j-1.7.36.jar
+
+COPY initial_commands.sh .
+RUN chmod +x initial_commands.sh
+
+# Run the script to start servers, create topic, and stop servers after 30 seconds
+RUN ./initial_commands.sh
+
+
+# Option 1
+
+# Define the entrypoint to start ZooKeeper and Kafka servers
+
+#ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties & \
+#    sleep 5; \
+#    kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties &"]
+
+
+# Option 2
+
+#ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh #kafka-3.7.0-src/config/zookeeper.properties & \
+#    kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties & \
+#   wait"]
+
+
+# Option 3
+
+#ENTRYPOINT ["sh", "-c", "kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties & \
+#   kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties & \
+#  tail -f /dev/null"]
+
+
+# Option 4
+
+# Create a script file to start the servers
+#COPY start_servers.sh /usr/local/bin/
+#RUN chmod +x /usr/local/bin/start_servers.sh
+
+
+# Use the script file as the ENTRYPOINT
+#ENTRYPOINT ["/usr/local/bin/start_servers.sh"]
+
+# Option 5
+
+# Start a shell process and keep it running
+#ENTRYPOINT ["/bin/bash", "-c", "--"]
+
+#ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 86400; done"]
+
+#This command sets the entrypoint of your container to run an infinite loop (while true; do sleep 86400; done). The loop sleeps for 86,400 seconds (24 hours), effectively keeping the container running indefinitely.
+
+# Run mannually after taking access to shell
+
+#kafka-3.7.0-src/bin/zookeeper-server-start.sh kafka-3.7.0-src/config/zookeeper.properties &
+#sleep 5
+#kafka-3.7.0-src/bin/kafka-server-start.sh kafka-3.7.0-src/config/server.properties &
+
+
+
+# Option 6
+
+# Create a script file for entrypoint
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+#ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "while true; do sleep 86400; done"]
+
+
+#ENTRYPOINT ["nohup", "kafka-3.7.0-src/bin/zookeeper-server-start.sh", "kafka-3.7.0-src/config/zookeeper.properties", ">", "/dev/null", "2>&1", "&"]
