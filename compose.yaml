@@ -20,7 +20,8 @@ services:
       - spring-net
 
   kafka:
-    image: apache/kafka
+    #image: apache/kafka
+    image: nervous_williamson
     ports:
       - "9092:9092"
     environment:
